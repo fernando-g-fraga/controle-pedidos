@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"log"
+	"time"
+)
 
 /*
 Table Produto
@@ -43,4 +47,43 @@ type produtoPedido struct {
 type pedido struct {
 	numero int
 	data   time.Time
+}
+
+func CreateTables(db *sql.DB) *sql.Row {
+
+	query := `
+	CREATE TABLE IF NOT EXISTS pedido(
+		numero INT NOT NULL PRIMARY KEY,
+		data DATE
+	);
+	
+	CREATE TABLE IF NOT EXISTS produto(
+		codigo INT NOT NULL PRIMARY KEY,
+		descricao VARCHAR (255),
+		preco DOUBLE (2)
+	);
+
+	CREATE TABLE IF NOT EXISTS  departamento(
+		codigo INT NOT NULL	PRIMARY KEY,
+		codigo_produto INT NOT NULL,
+		descricao VARCHAR (255),
+		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo)
+	);
+	CREATE IF NOT EXISTS TABLE pedidoProduto(
+		codigo INT NOT NULL PRIMARY KEY,
+		codigo_produto INT NOT NULL,
+		numero_pedido INT NOT NULL,
+		quantidade INT,
+		valorVenda DOUBLE(2),
+		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo)
+		FOREIGN KEY (numero_pedido) REFERENCES Pedido(numero)
+	);
+	`
+	row := db.QueryRow(query)
+
+	if row.Err() != nil {
+		log.Fatal("Error creating the tables", row)
+	}
+
+	return row
 }

@@ -11,9 +11,10 @@ func StartServer() *echo.Echo {
 
 	e := echo.New()
 
-	if err := e.Start(":8080"); err != http.ErrServerClosed {
+	if err := e.Start(":8000"); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+	log.Println("Listening :8000")
 
 	return e
 }
