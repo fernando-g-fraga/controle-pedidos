@@ -9,27 +9,22 @@ import (
 
 func main() {
 
-	//Executing SQL First Commands
-	db := model.StartDB()
-	row := model.CreateTables(db)
-	log.Println(row)
-
-	//creating mocks (1 time only)
-	model.InsertMockProdutos(db)
+	//Executing SQL Model
+	model.Config()
 
 	//Runing server
 	e := StartServer()
 
-	if err := e.Start(":8000"); err != http.ErrServerClosed {
-		log.Fatal(err)
-	}
-	log.Println("Listening :8000")
-
 	//Calling Routes
+	PostPedidos(e)
 	GetPedidosID(e)
 	UpdatePedidos(e)
 	DeletePedidos(e)
 	GetPedidos(e)
 	log.Println("Routes Ready to roll")
 
+	if err := e.Start(":8000"); err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
+	log.Println("Listening :8000")
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 )
@@ -40,9 +41,12 @@ type Departamento struct {
 	descricao      string
 }
 
-type ProdutoPedido struct {
-	quantidade int
-	valorVenda float32
+type PedidoProduto struct {
+	Numero         int64
+	Codigo_produto int
+	Numero_pedido  int64
+	Quantidade     int
+	ValorVenda     float64
 }
 
 type Pedido struct {
@@ -50,30 +54,37 @@ type Pedido struct {
 	data   time.Time
 }
 
-func CreateTables(db *sql.DB) sql.Result {
+var db = StartDB()
+
+func Config() {
+	CreateTables()
+	CreateMock()
+}
+
+func CreateTables() sql.Result {
 
 	query := `
 	CREATE TABLE IF NOT EXISTS pedido(
-	 	numero INT NOT NULL PRIMARY KEY,
+	 	numero SERIAL NOT NULL PRIMARY KEY,
 	 	data DATE
 	 );
 	
-
 	CREATE TABLE IF NOT EXISTS produto(
-		codigo INT NOT NULL PRIMARY KEY,
+		codigo SERIAL NOT NULL PRIMARY KEY,
 		descricao VARCHAR (255),
-		preco NUMERIC
+		preco NUMERIC,
+		NOME VARCHAR(70)
 	);
 
 	CREATE TABLE IF NOT EXISTS  departamento(
-		codigo INT NOT NULL	PRIMARY KEY,
+		codigo SERIAL NOT NULL	PRIMARY KEY,
 		codigo_produto INT NOT NULL,
 		descricao VARCHAR (255),
 		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo)
 	);
 
 	CREATE TABLE IF NOT EXISTS pedidoProduto(
-		codigo INT NOT NULL PRIMARY KEY,
+		codigo SERIAL NOT NULL PRIMARY KEY,
 		codigo_produto INT NOT NULL,
 		numero_pedido INT NOT NULL,
 		quantidade INT,
@@ -91,7 +102,7 @@ func CreateTables(db *sql.DB) sql.Result {
 	return row
 }
 
-func InsertMockProdutos(db *sql.DB) {
+func InsertMockProdutos() {
 
 	produtos := CreateMock()
 
@@ -104,4 +115,34 @@ func InsertMockProdutos(db *sql.DB) {
 
 	}
 
+}
+
+func CriaPedido() int64 {
+	var last_id int64
+	date := time.Now()
+	dateConv := date.Format("1/2/2006")
+	fmt.Println(date)
+	result := db.QueryRow(`INSERT INTO pedido (data)
+	 VALUES($1) RETURNING numero`, dateConv).Scan(&last_id)
+
+	if result == sql.ErrNoRows {
+		log.Panic("Error creating Pedido.")
+		return 0
+	}
+
+	return last_id
+}
+
+// TODO - Debuggar o erro "violation of foreign key relashioship"
+func CriaPedidoProduto(p PedidoProduto) int64 {
+	var last_id int64
+	result := db.QueryRow(`INSERT INTO pedidoproduto (codigo_produto, numero_pedido,quantidade,valorvenda)
+	VALUES($1,$2,$3,$4) RETURNING codigo`, p.Codigo_produto, p.Numero_pedido, p.Quantidade, p.ValorVenda).Scan(&last_id)
+
+	if result == sql.ErrNoRows {
+		log.Panic("Error creating PedidoProduto.")
+		return 0
+	}
+
+	return last_id
 }
