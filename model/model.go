@@ -27,24 +27,25 @@ data Date
 
 */
 
-type produto struct {
-	codigo    int
-	descricao string
-	preco     float32
+type Produto struct {
+	Codigo    int     `json:"codigo"`
+	Descricao string  `json:"descricao"`
+	Preco     float32 `json:"preco"`
+	Nome      string  `json:"nome"`
 }
 
-type departamento struct {
+type Departamento struct {
 	codigo         int
 	codigo_produto int
 	descricao      string
 }
 
-type produtoPedido struct {
+type ProdutoPedido struct {
 	quantidade int
 	valorVenda float32
 }
 
-type pedido struct {
+type Pedido struct {
 	numero int
 	data   time.Time
 }
@@ -88,4 +89,19 @@ func CreateTables(db *sql.DB) sql.Result {
 	}
 
 	return row
+}
+
+func InsertMockProdutos(db *sql.DB) {
+
+	produtos := CreateMock()
+
+	for _, valor := range produtos {
+
+		_, err := db.Exec("INSERT INTO produto VALUES($1,$2,$3,$4);", valor.Codigo, valor.Descricao, valor.Preco, valor.Nome)
+		if err != nil {
+			log.Fatal("Error creating the mock", err)
+		}
+
+	}
+
 }
