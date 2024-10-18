@@ -49,18 +49,19 @@ type pedido struct {
 	data   time.Time
 }
 
-func CreateTables(db *sql.DB) *sql.Row {
+func CreateTables(db *sql.DB) sql.Result {
 
 	query := `
 	CREATE TABLE IF NOT EXISTS pedido(
-		numero INT NOT NULL PRIMARY KEY,
-		data DATE
-	);
+	 	numero INT NOT NULL PRIMARY KEY,
+	 	data DATE
+	 );
 	
+
 	CREATE TABLE IF NOT EXISTS produto(
 		codigo INT NOT NULL PRIMARY KEY,
 		descricao VARCHAR (255),
-		preco DOUBLE (2)
+		preco NUMERIC
 	);
 
 	CREATE TABLE IF NOT EXISTS  departamento(
@@ -69,20 +70,21 @@ func CreateTables(db *sql.DB) *sql.Row {
 		descricao VARCHAR (255),
 		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo)
 	);
-	CREATE IF NOT EXISTS TABLE pedidoProduto(
+
+	CREATE TABLE IF NOT EXISTS pedidoProduto(
 		codigo INT NOT NULL PRIMARY KEY,
 		codigo_produto INT NOT NULL,
 		numero_pedido INT NOT NULL,
 		quantidade INT,
-		valorVenda DOUBLE(2),
-		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo)
+		valorVenda NUMERIC,
+		FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo),
 		FOREIGN KEY (numero_pedido) REFERENCES Pedido(numero)
 	);
 	`
-	row := db.QueryRow(query)
+	row, err := db.Exec(query)
 
-	if row.Err() != nil {
-		log.Fatal("Error creating the tables", row)
+	if err != nil {
+		log.Fatal("Error creating the tables", err)
 	}
 
 	return row
