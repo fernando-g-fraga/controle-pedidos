@@ -3,15 +3,15 @@ package controller
 import "github.com/labstack/echo/v4"
 
 func POSTpedidosHandler(c echo.Context) error {
-	
-	produtoPedido{
-		codigo
-		codigo_produto
-		numero_pedido
-		quantidade
-		ValorVenda
-	}
-	
+
+	// produtoPedido{
+	// 	codigo
+	// 	codigo_produto
+	// 	numero_pedido
+	// 	quantidade
+	// 	ValorVenda
+	// }
+
 	return nil
 }
 
