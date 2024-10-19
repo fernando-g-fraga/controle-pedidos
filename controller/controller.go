@@ -30,7 +30,18 @@ func POSTpedidosHandler(c echo.Context) error {
 }
 
 func GETpedidosIDHandler(c echo.Context) error {
-	return nil
+	id := c.FormValue("id")
+	idconv, _ := strconv.Atoi(id)
+
+	code, msg := model.GetPedidoID(idconv)
+
+	if code == 400 {
+		return c.JSON(code, map[string]string{"message": "Pedido não encontrado!"})
+	}
+	if code == 200 {
+		return c.JSON(code, msg)
+	}
+	return c.JSON(500, map[string]string{"mensagem": "ocorreu um erro"})
 }
 
 func PUTpedidosHandler(c echo.Context) error {
@@ -38,7 +49,11 @@ func PUTpedidosHandler(c echo.Context) error {
 }
 
 func DELETEpedidosHandler(c echo.Context) error {
-	return nil
+	id := c.FormValue("id")
+	idconv, _ := strconv.Atoi(id)
+	code, msg := model.DeletaPedido(idconv)
+
+	return c.JSON(code, map[string]string{"message": msg})
 }
 
 func GETpedidosHandler(c echo.Context) error {

@@ -14,7 +14,7 @@ func PostPedidos(e *echo.Echo) {
 
 // Routes
 func GetPedidosID(e *echo.Echo) {
-	e.GET("/pedidos/:id", controller.GETpedidosIDHandler)
+	e.GET("/pedidos", controller.GETpedidosIDHandler)
 
 }
 

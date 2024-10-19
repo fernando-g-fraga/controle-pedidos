@@ -16,6 +16,21 @@ The project uses the following Go modules:
     Additional indirect dependencies are handled automatically by Go's dependency management.
 
 All dependencies are managed in the go.mod file.
+
+### Todo List
+Table Pedidos:
+- [x]  Create
+- [x]  Delete
+- [ ]  Read ID
+- [ ]  Update
+
+Table Departamento:
+- [ ]  Read
+
+Advanced Stuff: 
+- [ ]  JointTable pedidoProduto
+- [ ]  Ordering and Filters
+
 Installation
 
 1. Clone the Repository

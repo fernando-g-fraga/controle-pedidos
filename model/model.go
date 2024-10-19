@@ -146,3 +146,36 @@ func CriaPedidoProduto(p PedidoProduto) int64 {
 
 	return last_id
 }
+
+func DeletaPedido(id int) (int, string) {
+	exists := 0
+
+	resultado := db.QueryRow(`SELECT numero FROM pedido WHERE numero = $1`, id).Scan(&exists)
+	log.Println(resultado)
+	if resultado == sql.ErrNoRows {
+		return 400, "não encontrado"
+	}
+	if exists != 0 {
+		resultado := db.QueryRow(`DELETE FROM pedido WHERE numero = $1`, id)
+		if resultado.Err() != nil {
+			log.Panic("Error deleting pedido")
+		}
+		return 200, "deletado com sucesso!"
+	} else {
+		return 404, "Pedido não encontrado"
+
+	}
+}
+
+func GetPedidoID(id int) (int, []string) {
+	var numero int64
+	var data string
+
+	result := db.QueryRow(`SELECT numero,data FROM pedido WHERE NUMERO=$1`, id).Scan(&numero, &data)
+
+	if result == sql.ErrNoRows {
+		return 404, []string{"pedido não encontrado"}
+	}
+
+	return 200, []string{fmt.Sprintf(`|%b| - Data: %s `, numero, data)}
+}
