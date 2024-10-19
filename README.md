@@ -21,14 +21,14 @@ All dependencies are managed in the go.mod file.
 Table Pedidos:
 - [x]  Create
 - [x]  Delete
-- [ ]  Read ID
-- [ ]  Update
+- [X]  Read ID
+- [X]  Update
 
 Table Departamento:
 - [ ]  Read
 
 Advanced Stuff: 
-- [ ]  JointTable pedidoProduto
+- [X]  JointTable pedidoProduto
 - [ ]  Ordering and Filters
 
 Installation

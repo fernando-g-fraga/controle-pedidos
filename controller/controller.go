@@ -45,7 +45,13 @@ func GETpedidosIDHandler(c echo.Context) error {
 }
 
 func PUTpedidosHandler(c echo.Context) error {
-	return nil
+	id := c.FormValue("id")
+	data := c.FormValue("data")
+	idconv, _ := strconv.Atoi(id)
+
+	code, msg := model.AtualizaPedido(idconv, data)
+
+	return c.JSON(code, msg)
 }
 
 func DELETEpedidosHandler(c echo.Context) error {

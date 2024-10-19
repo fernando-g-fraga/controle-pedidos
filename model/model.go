@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -58,7 +59,9 @@ var db = StartDB()
 
 func Config() {
 	CreateTables()
-	CreateMock()
+	log.Println("Tables Created")
+	InsertMockProdutos()
+	log.Println("Mock Created")
 }
 
 func CreateTables() sql.Result {
@@ -136,8 +139,13 @@ func CriaPedido() int64 {
 // TODO - Debuggar o erro "violation of foreign key relashioship"
 func CriaPedidoProduto(p PedidoProduto) int64 {
 	var last_id int64
-	result := db.QueryRow(`INSERT INTO pedidoproduto (codigo_produto, numero_pedido,quantidade,valorvenda)
-	VALUES($1,$2,$3,$4) RETURNING codigo`, p.Codigo_produto, p.Numero_pedido, p.Quantidade, p.ValorVenda).Scan(&last_id)
+
+	query := fmt.Sprintf(`INSERT INTO pedidoproduto (codigo_produto, numero_pedido,quantidade,valorvenda)
+	VALUES(%d,%d,%d,%f) RETURNING codigo`, p.Codigo_produto, p.Numero_pedido, p.Quantidade, p.ValorVenda)
+
+	print(query)
+
+	result := db.QueryRow(query).Scan(&last_id)
 
 	if result == sql.ErrNoRows {
 		log.Panic("Error creating PedidoProduto.")
@@ -178,4 +186,24 @@ func GetPedidoID(id int) (int, []string) {
 	}
 
 	return 200, []string{fmt.Sprintf(`|%b| - Data: %s `, numero, data)}
+}
+
+func AtualizaPedido(id int, data string) (int, []string) {
+	dataformat := strings.Replace(data, "/", "-", 2)
+
+	var numeroOut, dataOut string
+
+	query := fmt.Sprintf(`UPDATE pedido
+	SET DATA = '%s'
+	WHERE numero = %d
+	RETURNING numero, data`, dataformat, id)
+
+	result := db.QueryRow(query).Scan(&numeroOut, &dataOut)
+	dataOutFomatted, _ := strings.CutPrefix(data, "t")
+
+	if result == sql.ErrNoRows {
+		return 400, []string{"Pedido não encontrado!"}
+	}
+
+	return 200, []string{fmt.Sprintf("Numero: %s | Data: %s ", numeroOut, dataOutFomatted)}
 }
